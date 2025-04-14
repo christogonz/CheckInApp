@@ -10,7 +10,7 @@ import SwiftUI
 struct HeaderView: View {
     var body: some View {
         HStack {
-            Text("WorkPlan")
+            Text("TestPlan")
                 .font(.title)
                 .foregroundStyle(Color.accentColor)
                 .fontWeight(.bold)
