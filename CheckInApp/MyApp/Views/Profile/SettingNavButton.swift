@@ -29,7 +29,6 @@ struct SettingNavButton<Destination: View>: View {
                 Image(systemName: "chevron.right")
                     .foregroundStyle(Color.text)
             }
-            
             .padding(.horizontal)
             .padding(.top)
             

@@ -9,19 +9,43 @@ import SwiftUI
 
 struct ContentView: View {
     @StateObject var sessionVM = SessionViewModel()
+    @StateObject var authVM = AuthViewModel()
     
     var body: some View {
-        TabView {
-            HomeView()
-                .tabItem {
-                    Label("Home", systemImage: "house")
+        Group {
+            if authVM.user != nil {
+                TabView {
+                    HomeView()
+                        .tabItem {
+                            Label("Home", systemImage: "house")
+                        }
+                    
+                    ProfileView()
+                        .tabItem {
+                            Label("Settings", systemImage: "person")
+                        }
                 }
-            ProfileView()
-                .tabItem {
-                    Label("Profile", systemImage: "person")
-                }
+                .environmentObject(sessionVM)
+            } else {
+                SignInView()
+            }
         }
-        .environmentObject(sessionVM)
+        .environmentObject(authVM)
+        
+        
+        
+        
+//        TabView {
+//            HomeView()
+//                .tabItem {
+//                    Label("Home", systemImage: "house")
+//                }
+//            ProfileView()
+//                .tabItem {
+//                    Label("Profile", systemImage: "person")
+//                }
+//        }
+//        .environmentObject(sessionVM)
     }
 }
 
