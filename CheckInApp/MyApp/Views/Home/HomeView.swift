@@ -21,7 +21,7 @@ struct HomeView: View {
                 ActiveSessionButton()
             }
             .background(Color("background"))
-//            .navigationTitle(Text("Check-In"))
+
         }
     }
 }

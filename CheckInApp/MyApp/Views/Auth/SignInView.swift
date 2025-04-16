@@ -76,9 +76,6 @@ struct SignInView: View {
                         .font(.footnote)
                         .foregroundStyle(Color.accentColor)
                 }
-                
-//                Text(isRegistering ? "Have an account? Sign In" : "Don't have an account? Sign Up")
-//                    .font(.footnote)
             })
             .padding()
         }

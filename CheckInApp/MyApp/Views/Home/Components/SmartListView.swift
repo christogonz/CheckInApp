@@ -55,9 +55,7 @@ struct SmartListView: View {
                                     Image(systemName: "clock")
                                     Text("Session logs")
                                     Spacer()
-                                    Image(systemName: "plus.circle")
-                                        .foregroundStyle(Color("AccentColor"))
-                                        .fontWeight(.semibold)
+                                    
                                 }
                                 .foregroundStyle(Color("text"))
                                 .padding(10)
