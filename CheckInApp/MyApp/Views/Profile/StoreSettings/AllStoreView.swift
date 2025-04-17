@@ -10,7 +10,7 @@ import SwiftUI
 struct AllStoreView: View {
     @StateObject private var storeVM = StoreViewModel()
     @State private var showingAddModal = false
-    
+
     @State private var selectedStore: Store?
     @State private var showingEditModal = false
 
@@ -36,14 +36,14 @@ struct AllStoreView: View {
             }
             .padding(.horizontal)
 
-            if storeVM.userStores.isEmpty {
+            if storeVM.repository.stores.isEmpty {
                 Text("No stores yet")
                     .foregroundColor(.gray)
                     .padding(.horizontal)
             } else {
                 ScrollView {
                     VStack(spacing: 12) {
-                        ForEach(storeVM.allStores) { store in
+                        ForEach(storeVM.repository.stores) { store in
                             StoreRow(store: store) {
                                 selectedStore = store
                                 showingEditModal = true
@@ -59,7 +59,9 @@ struct AllStoreView: View {
                     .padding(.horizontal)
                 }
             }
+            Spacer()
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .sheet(isPresented: $showingAddModal) {
             AddStoreModal(isPresented: $showingAddModal)
                 .environmentObject(storeVM)
@@ -68,7 +70,6 @@ struct AllStoreView: View {
         .background(Color.background)
     }
 }
-
 
 #Preview {
     AllStoreView()

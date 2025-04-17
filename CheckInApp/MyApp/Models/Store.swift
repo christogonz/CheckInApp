@@ -5,38 +5,40 @@
 //  Created by Christopher Gonzalez on 2025-03-31.
 //
 
-import Foundation
+//
+//  Store.swift
+//  CheckInApp
+//
 
-// MARK: - Model
+import Foundation
+import FirebaseFirestore
+
 struct Store: Identifiable, Codable, Equatable {
-    var id: UUID
+    var id: String?
     var name: String
     var location: String
+    var chain: String? // Opcional
     
-    init(id: UUID = UUID(), name: String, location: String) {
+    init(id: String? = nil, name: String, location: String, chain: String? = nil) {
         self.id = id
         self.name = name
         self.location = location
+        self.chain = chain
     }
 }
-
-struct Session: Codable {
-    var checkIn: Date?
-    var checkOut: Date?
-    var store: Store?
-}
-
-struct Survey: Codable {
-    var question1: Bool
-    var question2: Bool
-    var question3: Bool
-}
-
-struct SessionRecord: Identifiable, Codable {
-    var id = UUID()
-    let store: Store
-    var checkIn: Date
-    var checkOut: Date
-}
-
+//struct Session: Codable {
+//    var checkIn: Date?
+//    var checkOut: Date?
+//    var store: Store?
+//}
+//
+//
+//struct SessionRecord: Identifiable, Codable {
+//    @DocumentID var id: String? 
+//    var storeID: String
+//    var checkIn: Date
+//    var checkOut: Date
+//    var userID: String
+//}
+//
 

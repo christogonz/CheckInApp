@@ -10,23 +10,21 @@ import SwiftUI
 struct StoreDetailView: View {
     @StateObject var customSurveyVM = CustomSurveyViewModel()
     @State var responseVM = SurveyResponseViewModel()
-    
+
     let store: Store
     @EnvironmentObject var sessionVM: SessionViewModel
 
-    var survey: Survey {
-        sessionVM.surveys[store.id.uuidString] ?? Survey(question1: false, question2: false, question3: false)
-    }
-
-    func formattedElapsedTime(from interval: TimeInterval) -> String {
-        let minutes = Int(interval) / 60
-        let seconds = Int(interval) % 60
+    func formattedElapsedTime(from start: Date, to end: Date) -> String {
+        let interval = Int(end.timeIntervalSince(start))
+        let minutes = interval / 60
+        let seconds = interval % 60
         return String(format: "%02dm %02ds", minutes, seconds)
     }
 
     var body: some View {
         VStack {
-            Text("\(store.name)")
+            // Título
+            Text(store.name)
                 .foregroundStyle(Color.text)
                 .font(.largeTitle)
                 .fontWeight(.bold)
@@ -34,56 +32,66 @@ struct StoreDetailView: View {
             Text("Location: \(store.location)")
                 .foregroundStyle(Color.secondary)
 
+            // Session Info (Siempre visible)
+            let isCurrentStoreSession = sessionVM.session?.store?.id == store.id && sessionVM.session?.checkOut == nil
+            let lastRecord = sessionVM.lastSession(for: store.id ?? "")
+
             HStack {
                 Spacer()
 
-                // Check-In Text
                 VStack {
                     Text("Check-in")
                         .fontWeight(.semibold)
                         .foregroundStyle(Color.secondary)
-                    if let checkIn = sessionVM.session.checkIn, sessionVM.session.store == store {
+                    if isCurrentStoreSession, let checkIn = sessionVM.session?.checkIn {
                         Text(checkIn.formatted(date: .omitted, time: .shortened))
+                    } else if let checkIn = lastRecord?.checkIn {
+                        Text(checkIn.formatted(date: .omitted, time: .shortened))
+                    } else {
+                        Text("-")
                     }
                     Spacer()
                 }
                 .frame(width: 100)
 
                 Spacer()
-                Divider().foregroundStyle(Color.text)
+                Divider()
                 Spacer()
 
-                // Check-Out Text
                 VStack {
                     Text("Check-out")
                         .fontWeight(.semibold)
                         .foregroundStyle(Color.secondary)
-                    if let checkOut = sessionVM.session.checkOut, sessionVM.session.store == store {
+
+                    if isCurrentStoreSession {
+                        Text("-")
+                    } else if let checkOut = lastRecord?.checkOut {
                         Text(checkOut.formatted(date: .omitted, time: .shortened))
+                    } else {
+                        Text("-")
                     }
+
                     Spacer()
                 }
                 .frame(width: 100)
 
                 Spacer()
-                Divider().foregroundStyle(Color.secondary)
+                Divider()
                 Spacer()
 
-                // Total Time
                 VStack {
                     Text("In-Store")
                         .fontWeight(.semibold)
                         .foregroundStyle(Color.secondary)
 
-                    if let checkIn = sessionVM.session.checkIn, sessionVM.session.store == store {
-                        if sessionVM.session.checkOut == nil {
-                            // Tiempo en vivo desde el ViewModel
-                            Text(formattedElapsedTime(from: sessionVM.elapsedTime))
-                        } else if let checkOut = sessionVM.session.checkOut {
-                            // Tiempo fijo
-                            let total = checkOut.timeIntervalSince(checkIn)
-                            Text(formattedElapsedTime(from: total))
+                    if isCurrentStoreSession, let checkIn = sessionVM.session?.checkIn {
+                        if sessionVM.session?.checkOut == nil {
+                            Text(formattedElapsedTime(from: checkIn, to: Date()))
+                        } else if let checkOut = sessionVM.session?.checkOut {
+                            Text(formattedElapsedTime(from: checkIn, to: checkOut))
                         }
+                    } else if let checkIn = lastRecord?.checkIn, let checkOut = lastRecord?.checkOut {
+                        Text(formattedElapsedTime(from: checkIn, to: checkOut))
                     } else {
                         Text("-")
                     }
@@ -98,7 +106,7 @@ struct StoreDetailView: View {
 
             Divider()
 
-            //MARK: Survey List
+            // Surveys
             Text("Surveys")
                 .font(.title2)
                 .fontWeight(.bold)
@@ -108,10 +116,13 @@ struct StoreDetailView: View {
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 10) {
                     ForEach(customSurveyVM.surveys) { survey in
-                        NavigationLink(destination: SurveyResponseView(
-                            survey: survey,
-                            store: store,
-                            responseViewModel: responseVM)) {
+                        NavigationLink(
+                            destination: SurveyResponseView(
+                                survey: survey,
+                                store: store,
+                                responseViewModel: responseVM
+                            )
+                        ) {
                             Text(survey.title)
                                 .foregroundStyle(Color.text)
                                 .font(.headline)
@@ -121,34 +132,34 @@ struct StoreDetailView: View {
                                 .clipShape(.rect(cornerRadius: 10))
                         }
                     }
+
+                    // MARK: Session Logs Section
+                    StoreSessionHistoryView(storeID: store.id ?? "")
+                        .padding(.top)
                 }
             }
             .padding(.top, 8)
 
             Spacer()
 
-            // Check-in Button
-                if sessionVM.session.store != store || sessionVM.session.checkOut != nil {
-                    
-                    
-                    CustomButton(
-                        title: "Check In",
-                        backgroundColor: Color.accentColor,
-                        action: {
-                            sessionVM.checkIn(to: store)
-                        }
-                  )
-
-                } else {
-                    
-                    CustomButton(
-                        title: "Check Out",
-                        backgroundColor: Color.red,
-                        action: {
-                            sessionVM.checkOut()
-                        }
-                    )
-                }
+            // Botón de Check-In/Out
+            if sessionVM.session?.store?.id != store.id || sessionVM.session?.checkOut != nil {
+                CustomButton(
+                    title: "Check In",
+                    backgroundColor: Color.accentColor,
+                    action: {
+                        sessionVM.checkIn(to: store)
+                    }
+                )
+            } else {
+                CustomButton(
+                    title: "Check Out",
+                    backgroundColor: Color.red,
+                    action: {
+                        sessionVM.checkOut()
+                    }
+                )
+            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding(.horizontal)
@@ -158,10 +169,20 @@ struct StoreDetailView: View {
 
 #Preview {
     let sessionVM = SessionViewModel()
-        let testStore = Store(id: UUID(), name: "EG Barkarby", location: "Barkarby")
-        sessionVM.checkIn(to: testStore)
+    let storeVM = StoreViewModel()
+    let store = Store(id: "store-1", name: "EG Barkarby", location: "Barkarby")
 
-        return StoreDetailView(store: testStore)
-            .environmentObject(sessionVM)
+    // Simular historial con último check-in y check-out
+    sessionVM.history = [
+        SessionRecord(
+            storeID: store.id ?? "store-1",
+            checkIn: Date().addingTimeInterval(-3600),
+            checkOut: Date().addingTimeInterval(-1800),
+            userID: "demo-user"
+        )
+    ]
+
+    return StoreDetailView(store: store)
+        .environmentObject(sessionVM)
+        .environmentObject(storeVM) // ✅ Añadir esto
 }
-

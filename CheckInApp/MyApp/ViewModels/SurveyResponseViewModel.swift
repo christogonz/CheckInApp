@@ -6,40 +6,86 @@
 //
 
 import Foundation
-
+import FirebaseFirestore
+import FirebaseAuth
 
 class SurveyResponseViewModel: ObservableObject {
-    @Published var responses: [SurveyResponse] {
+    private let db = Firestore.firestore()
+    private let collection = "surveyResponses"
 
-        
-        didSet {
-            UserDefaults.save(responses, key: "surveyResponses")
-        }
-    }
+    @Published var responses: [SurveyResponse] = []
+    private var listener: ListenerRegistration?
 
-    
     init() {
-        self.responses = UserDefaults.load(key: "surveyResponses", defaultValue: [])
+        fetchResponses()
     }
 
-    func response(for surveyID: UUID, storeID: UUID) -> SurveyResponse {
-        if let existing = responses.first(where: { $0.surveyID == surveyID && $0.storeID == storeID }) {
+    func fetchResponses() {
+        guard let userID = Auth.auth().currentUser?.uid else {
+            print("No user logged in")
+            return
+        }
+
+        listener?.remove() // Detach previous listener if any
+
+        listener = db.collection(collection)
+            .whereField("userID", isEqualTo: userID)
+            .addSnapshotListener { snapshot, error in
+                guard let documents = snapshot?.documents else {
+                    print("Error fetching responses: \(error?.localizedDescription ?? "Unknown error")")
+                    return
+                }
+
+                self.responses = documents.compactMap { doc in
+                    try? doc.data(as: SurveyResponse.self)
+                }
+            }
+    }
+
+    func response(for surveyID: String, storeID: String) -> SurveyResponse {
+        guard let userID = Auth.auth().currentUser?.uid else {
+            return SurveyResponse(surveyID: surveyID, storeID: storeID, userID: "", answers: [:])
+        }
+
+        if let existing = responses.first(where: { $0.surveyID == surveyID && $0.storeID == storeID && $0.userID == userID }) {
             return existing
         } else {
-            let new = SurveyResponse(surveyID: surveyID, storeID: storeID, answers: [:])
-            responses.append(new)
+            let new = SurveyResponse(surveyID: surveyID, storeID: storeID, userID: userID, answers: [:])
+            saveResponse(new)
             return new
         }
     }
 
-    func updateAnswer(surveyID: UUID, storeID: UUID, questionID: UUID, answer: Answer) {
-        if let index = responses.firstIndex(where: { $0.surveyID == surveyID && $0.storeID == storeID }) {
+    func updateAnswer(surveyID: String, storeID: String, questionID: String, answer: Answer) {
+        guard let userID = Auth.auth().currentUser?.uid else { return }
+
+        if let index = responses.firstIndex(where: { $0.surveyID == surveyID && $0.storeID == storeID && $0.userID == userID }) {
             responses[index].answers[questionID] = answer
+            saveResponse(responses[index])
         } else {
-            var new = SurveyResponse(surveyID: surveyID, storeID: storeID, answers: [:])
+            var new = SurveyResponse(surveyID: surveyID, storeID: storeID, userID: userID, answers: [:])
             new.answers[questionID] = answer
-            responses.append(new)
+            saveResponse(new)
         }
     }
-}
 
+    private func saveResponse(_ response: SurveyResponse) {
+        if let docID = response.id {
+            do {
+                try db.collection(collection).document(docID).setData(from: response)
+            } catch {
+                print("Error updating response: \(error.localizedDescription)")
+            }
+        } else {
+            do {
+                _ = try db.collection(collection).addDocument(from: response)
+            } catch {
+                print("Error saving new response: \(error.localizedDescription)")
+            }
+        }
+    }
+
+    deinit {
+        listener?.remove()
+    }
+}

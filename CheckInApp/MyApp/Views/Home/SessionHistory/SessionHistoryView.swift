@@ -9,6 +9,8 @@ import SwiftUI
 
 struct SessionHistoryView: View {
     @EnvironmentObject var sessionVM: SessionViewModel
+    @EnvironmentObject var storeVM: StoreViewModel
+
     @State private var showDatePicker = false
     @State private var selectedDate: Date? = nil
 
@@ -66,9 +68,13 @@ struct SessionHistoryView: View {
 
             ScrollView {
                 LazyVStack(spacing: 16) {
-                    ForEach(Dictionary(grouping: filteredHistory) { record in
-                        Calendar.current.startOfDay(for: record.checkIn)
-                    }.sorted(by: { $0.key > $1.key }), id: \ .key) { date, records in
+                    ForEach(
+                        Dictionary(grouping: filteredHistory) { record in
+                            Calendar.current.startOfDay(for: record.checkIn)
+                        }
+                        .sorted(by: { $0.key > $1.key }),
+                        id: \.key
+                    ) { date, records in
                         VStack(alignment: .leading, spacing: 8) {
                             Text(date.formatted(date: .abbreviated, time: .omitted))
                                 .font(.headline)
@@ -76,8 +82,8 @@ struct SessionHistoryView: View {
                                 .padding(.leading)
 
                             ForEach(records.sorted { $0.checkIn > $1.checkIn }) { record in
-                                //-- SessionlogCard
                                 SessionLogCard(record: record)
+                                    .environmentObject(storeVM)
                             }
                         }
                     }
@@ -90,10 +96,25 @@ struct SessionHistoryView: View {
 }
 
 #Preview {
-    let vm = SessionViewModel()
-    vm.history = [
-        SessionRecord(store: Store(name: "Elgiganten", location: "Stockholm"), checkIn: Date().addingTimeInterval(-4000), checkOut: Date().addingTimeInterval(-2000)),
-        SessionRecord(store: Store(name: "Telia", location: "Uppsala"), checkIn: Date().addingTimeInterval(-90000), checkOut: Date().addingTimeInterval(-88000))
+    let sessionVM = SessionViewModel()
+    let storeVM = StoreViewModel()
+
+    sessionVM.history = [
+        SessionRecord(
+            storeID: "store-1",
+            checkIn: Date().addingTimeInterval(-4000),
+            checkOut: Date().addingTimeInterval(-2000),
+            userID: "user1"
+        ),
+        SessionRecord(
+            storeID: "store-2",
+            checkIn: Date().addingTimeInterval(-90000),
+            checkOut: Date().addingTimeInterval(-88000),
+            userID: "user1"
+        )
     ]
-    return SessionHistoryView().environmentObject(vm)
+
+    return SessionHistoryView()
+        .environmentObject(sessionVM)
+        .environmentObject(storeVM)
 }

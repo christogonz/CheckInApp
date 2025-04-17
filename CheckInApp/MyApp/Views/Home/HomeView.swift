@@ -13,26 +13,26 @@ struct HomeView: View {
         NavigationStack {
             VStack {
                 HeaderView()
-                
+
                 SmartListView()
-                
+
                 Spacer()
-                
+
                 ActiveSessionButton()
             }
             .background(Color("background"))
-
         }
     }
 }
 
-
 #Preview {
     let sessionVM = SessionViewModel()
-        
-        // Simular una sesión activa (opcional para ver el botón en Canvas)
-        sessionVM.checkIn(to: Store(id: UUID(), name: "EG Barkarby", location: "Barkarby"))
+    let storeVM = StoreViewModel()
 
-        return HomeView()
-            .environmentObject(sessionVM)
+    // Simular una sesión activa para previsualización
+    sessionVM.checkIn(to: Store(name: "EG Barkarby", location: "Barkarby"))
+
+    return HomeView()
+        .environmentObject(sessionVM)
+        .environmentObject(storeVM)
 }

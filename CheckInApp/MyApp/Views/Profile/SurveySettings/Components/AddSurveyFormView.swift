@@ -12,7 +12,9 @@ struct AddSurveyFormView: View {
     @ObservedObject var viewModel: CustomSurveyViewModel
 
     @State private var title = ""
-    @State private var questions: [SurveyQuestion] = []
+    @State private var questions: [SurveyQuestion] = [
+//        SurveyQuestion(text: "Example question", hasCheckmark: true, hasTextField: true)
+    ]
     @State private var questionText = ""
     @State private var includeCheckmark = true
     @State private var includeTextField = false
@@ -70,23 +72,27 @@ struct AddSurveyFormView: View {
             ScrollView {
                 VStack(spacing: 12) {
                     ForEach(questions) { question in
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(question.text)
-                                .font(.subheadline)
-                            HStack {
-                                if question.hasCheckmark { Text("✅") }
-                                if question.hasTextField { Text("🔢") }
+                        
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(question.text)
+                                    .font(.subheadline)
+                                HStack {
+                                    if question.hasCheckmark { Text("✅") }
+                                    if question.hasTextField { Text("🔢") }
+                                }
                             }
-                        }
-                        .padding()
-                        .background(Color.secondary.opacity(0.1))
-                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                            .padding()
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(Color.secondary.opacity(0.1))
+                            .clipShape(RoundedRectangle(cornerRadius: 10))
+                        
                     }
                     .onDelete { indexSet in
                         questions.remove(atOffsets: indexSet)
                     }
                 }
             }
+
 
             Spacer()
 

@@ -6,31 +6,34 @@
 //
 
 import Foundation
-
+import Combine
 
 class CustomSurveyViewModel: ObservableObject {
-    @Published var surveys: [SurveyForm] {
-        didSet {
-            UserDefaults.save(surveys, key: "customSurveys")
-        }
-    }
+    @Published var surveys: [SurveyForm] = []
     
+    private let repository = SurveyRepository()
+
     init() {
-        self.surveys = UserDefaults.load(key: "customSurveys", defaultValue: [])
+        fetchSurveys()
     }
-    
+
+    func fetchSurveys() {
+        repository.fetchSurveys { [weak self] fetched in
+            DispatchQueue.main.async {
+                self?.surveys = fetched
+            }
+        }
+    }
+
     func addSurvey(_ survey: SurveyForm) {
-        surveys.append(survey)
+        repository.addSurvey(survey)
     }
-    
+
     func updateSurvey(original: SurveyForm, updated: SurveyForm) {
-        if let index = surveys.firstIndex(of: original) {
-            surveys[index] = updated
-        }
+        repository.updateSurvey(updated)
     }
-    
+
     func deleteSurvey(by survey: SurveyForm) {
-        if let index = surveys.firstIndex(of: survey) {
-            surveys.remove(at: index)
-        }
-    }}
+        repository.deleteSurvey(survey)
+    }
+}

@@ -55,7 +55,7 @@ struct ProfileView: View {
                         Spacer()
                     }
 
-                    SettingNavButton(icon: "person", title: "My Profile", destionation: AllStoreView())
+                    SettingNavButton(icon: "person", title: "My Account", destionation: MyAccountView())
                     SettingNavButton(icon: "storefront", title: "Store Settings", destionation: AllStoreView())
                     SettingNavButton(icon: "questionmark.text.page", title: "Survey Settings", destionation: CreateSurveyListView())
 

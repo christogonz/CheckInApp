@@ -40,8 +40,8 @@ struct CreateSurveyListView: View {
             } else {
                 ScrollView {
                     VStack(spacing: 12) {
-                        ForEach(viewModel.surveys) { survey in
-                            NavigationLink(destination: EditSurveyFormView(viewModel: viewModel, survey: survey)) {
+                        ForEach(viewModel.surveys, id: \.safeID) { survey in
+                            NavigationLink(destination: EditSurveyFormView(survey: survey, viewModel: viewModel)) {
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text(survey.title)
                                         .font(.headline)
@@ -57,7 +57,9 @@ struct CreateSurveyListView: View {
                     .padding(.horizontal)
                 }
             }
+            Spacer()
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .sheet(isPresented: $showingAddSurvey) {
             AddSurveyFormView(viewModel: viewModel)
         }

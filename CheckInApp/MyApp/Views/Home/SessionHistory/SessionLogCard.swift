@@ -9,11 +9,16 @@ import SwiftUI
 
 struct SessionLogCard: View {
     let record: SessionRecord
+    @EnvironmentObject var storeVM: StoreViewModel
+
+    var storeName: String {
+        storeVM.repository.stores.first(where: { $0.id == record.storeID })?.name ?? "Unknown Store"
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text(record.store.name)
+                Text(storeName)
                     .font(.headline)
                 Spacer()
                 Text(record.checkIn.formatted(date: .abbreviated, time: .omitted))
@@ -49,9 +54,13 @@ struct SessionLogCard: View {
 
 #Preview {
     let record = SessionRecord(
-        store: Store(name: "EG Barkarby", location: "Barkarby"),
+        storeID: "demo-id",
         checkIn: Date().addingTimeInterval(-3000),
-        checkOut: Date()
+        checkOut: Date(),
+        userID: "test-user"
     )
+
+    let vm = StoreViewModel()
     return SessionLogCard(record: record)
+        .environmentObject(vm)
 }

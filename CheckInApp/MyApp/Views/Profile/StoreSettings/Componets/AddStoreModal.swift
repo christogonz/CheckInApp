@@ -13,6 +13,7 @@ struct AddStoreModal: View {
 
     @State private var name = ""
     @State private var location = ""
+    @State private var chain = ""
 
     var body: some View {
         VStack(spacing: 20) {
@@ -30,11 +31,17 @@ struct AddStoreModal: View {
                     .padding()
                     .background(Color.gray.opacity(0.1))
                     .clipShape(RoundedRectangle(cornerRadius: 10))
+
+                TextField("Store Chain (optional)", text: $chain)
+                    .padding()
+                    .background(Color.gray.opacity(0.1))
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
             }
 
             Button(action: {
                 guard !name.isEmpty && !location.isEmpty else { return }
-                storeVM.userStores.append(Store(name: name, location: location))
+                let newStore = Store(name: name, location: location, chain: chain.isEmpty ? nil : chain)
+                storeVM.repository.addStore(newStore)
                 isPresented = false
             }) {
                 Text("Add Store")
@@ -52,7 +59,6 @@ struct AddStoreModal: View {
         .presentationDetents([.medium, .large])
     }
 }
-
 
 #Preview {
     AddStoreModal(isPresented: .constant(true))

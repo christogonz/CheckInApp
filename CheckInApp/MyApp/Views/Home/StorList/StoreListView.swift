@@ -95,30 +95,3 @@ struct StoreListView: View {
 #Preview {
     StoreListView()
 }
-
-
-
-
-
-//List {
-//    if storeVM.filteredStores.isEmpty {
-//        Text("No stores found.").foregroundColor(.gray)
-//    } else {
-//        ForEach(storeVM.filteredStores) { store in
-//            NavigationLink(destination: StoreDetailView(store: store)) {
-//                VStack(alignment: .leading) {
-//                    Text(store.name)
-//                    Text(store.location)
-//                        .font(.subheadline)
-//                        .foregroundColor(.gray)
-//                }
-//            }
-//        }
-//    }
-//}
-//.searchable(text: $storeVM.searchText)
-//.navigationTitle("Stores")
-//.onDisappear {
-//    storeVM.searchText = ""
-//}
-//}
