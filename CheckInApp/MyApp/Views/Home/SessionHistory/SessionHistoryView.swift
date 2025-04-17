@@ -96,7 +96,7 @@ struct SessionHistoryView: View {
 }
 
 #Preview {
-    let sessionVM = SessionViewModel()
+    let sessionVM = SessionViewModel(userID: "preview-user")
     let storeVM = StoreViewModel()
 
     sessionVM.history = [
@@ -115,6 +115,8 @@ struct SessionHistoryView: View {
     ]
 
     return SessionHistoryView()
+    
+    
         .environmentObject(sessionVM)
         .environmentObject(storeVM)
 }

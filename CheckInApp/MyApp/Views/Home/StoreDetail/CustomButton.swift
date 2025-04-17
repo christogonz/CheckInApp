@@ -28,7 +28,6 @@ struct CustomButton: View {
                 .clipShape(RoundedRectangle(cornerRadius: 10))
 
         }
-//        .safeAreaPadding()
     }
 }
 

@@ -26,10 +26,9 @@ struct HomeView: View {
 }
 
 #Preview {
-    let sessionVM = SessionViewModel()
+    let sessionVM = SessionViewModel(userID: "preview-user")
     let storeVM = StoreViewModel()
 
-    // Simular una sesión activa para previsualización
     sessionVM.checkIn(to: Store(name: "EG Barkarby", location: "Barkarby"))
 
     return HomeView()

@@ -19,7 +19,7 @@ struct SmartListView: View {
     var body: some View {
         ScrollView {
             LazyVGrid(columns: gridItems, spacing: 16) {
-                // Card 1: Store List
+                
                 NavigationLink(destination: StoreListView()) {
                     cardView(
                         icon: "calendar",
@@ -30,7 +30,7 @@ struct SmartListView: View {
                     )
                 }
 
-                // Card 2: Session Logs — ahora con los env objects
+                
                 NavigationLink(destination:
                     SessionHistoryView()
                         .environmentObject(sessionVM)
@@ -84,7 +84,9 @@ struct SmartListView: View {
 }
 
 #Preview {
+    let sessionVM = SessionViewModel(userID: "preview-user")
+    
     SmartListView()
         .environmentObject(StoreViewModel())
-        .environmentObject(SessionViewModel())
+        .environmentObject(sessionVM)
 }

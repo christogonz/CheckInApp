@@ -26,7 +26,7 @@ class SurveyResponseViewModel: ObservableObject {
             return
         }
 
-        listener?.remove() // Detach previous listener if any
+        listener?.remove()
 
         listener = db.collection(collection)
             .whereField("userID", isEqualTo: userID)

@@ -13,7 +13,7 @@ struct SurveyForm: Identifiable, Codable, Equatable {
     var title: String
     var questions: [SurveyQuestion]
 
-    // Computed ID for Identifiable fallback
+    
     var safeID: String { id ?? UUID().uuidString }
 }
 
@@ -33,7 +33,7 @@ struct SurveyResponse: Identifiable, Codable, Equatable {
     var userID: String
     var answers: [String: Answer]
 
-    // Computed ID for Identifiable fallback
+    
     var safeID: String { id ?? UUID().uuidString }
 }
 

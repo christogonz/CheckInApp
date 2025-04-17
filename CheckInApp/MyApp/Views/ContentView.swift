@@ -8,13 +8,14 @@
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject var sessionVM = SessionViewModel()
     @StateObject var authVM = AuthViewModel()
     @StateObject var storeVM = StoreViewModel()
 
     var body: some View {
         Group {
-            if authVM.user != nil {
+            if let user = authVM.user {
+                let sessionVM = SessionViewModel(userID: user.uid)
+
                 TabView {
                     HomeView()
                         .tabItem {
@@ -26,13 +27,14 @@ struct ContentView: View {
                             Label("Settings", systemImage: "person")
                         }
                 }
+                .environmentObject(authVM)
+                .environmentObject(storeVM)
                 .environmentObject(sessionVM)
-                .environmentObject(storeVM) // ✅ Añadir StoreViewModel
             } else {
                 SignInView()
+                    .environmentObject(authVM)
             }
         }
-        .environmentObject(authVM)
     }
 }
 

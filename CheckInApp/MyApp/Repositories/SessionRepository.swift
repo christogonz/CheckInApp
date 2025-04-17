@@ -12,27 +12,23 @@ import Combine
 
 class SessionRepository: ObservableObject {
     private let db = Firestore.firestore()
-    private let collection = "sessions"
+        private let collection = "sessions"
+        private let userID: String
 
-    @Published var sessions: [SessionRecord] = []
+        @Published var sessions: [SessionRecord] = []
 
-    var sessionsPublisher: AnyPublisher<[SessionRecord], Never> {
-        $sessions.eraseToAnyPublisher()
-    }
-
-    init() {
-        fetchUserSessions()
-    }
-
-    func fetchUserSessions() {
-        guard let uid = Auth.auth().currentUser?.uid else {
-            print("No authenticated user")
-            self.sessions = []
-            return
+        var sessionsPublisher: AnyPublisher<[SessionRecord], Never> {
+            $sessions.eraseToAnyPublisher()
         }
 
+        init(userID: String) {
+            self.userID = userID
+            fetchUserSessions(for: userID)
+        }
+
+    func fetchUserSessions(for userID: String) {
         db.collection(collection)
-            .whereField("userID", isEqualTo: uid)
+            .whereField("userID", isEqualTo: userID)
             .order(by: "checkIn", descending: true)
             .addSnapshotListener { snapshot, error in
                 if let error = error {
@@ -40,8 +36,8 @@ class SessionRepository: ObservableObject {
                     return
                 }
 
-                self.sessions = snapshot?.documents.compactMap { doc in
-                    try? doc.data(as: SessionRecord.self)
+                self.sessions = snapshot?.documents.compactMap {
+                    try? $0.data(as: SessionRecord.self)
                 } ?? []
             }
     }

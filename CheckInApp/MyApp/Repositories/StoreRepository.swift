@@ -19,7 +19,6 @@ class StoreRepository: ObservableObject {
         fetchStores()
     }
 
-    // 🟢 get Stores from firebase
     func fetchStores() {
         db.collection(collection).addSnapshotListener { snapshot, error in
             guard let documents = snapshot?.documents else {
@@ -35,18 +34,18 @@ class StoreRepository: ObservableObject {
         }
     }
 
-    // 🟢 add new store with id
+
     func addStore(_ store: Store) {
         do {
             var newStore = store
-            newStore.id = nil // Firestore generate the ID
+            newStore.id = nil
             _ = try db.collection(collection).addDocument(from: newStore)
         } catch {
             print("Error adding store: \(error.localizedDescription)")
         }
     }
 
-    // 🟡 Apdate name and location
+    
     func updateStoreFields(storeId: String, name: String?, location: String?, completion: ((Error?) -> Void)? = nil) {
         var data: [String: Any] = [:]
         if let name = name { data["name"] = name }
@@ -55,7 +54,7 @@ class StoreRepository: ObservableObject {
         db.collection(collection).document(storeId).updateData(data, completion: completion)
     }
 
-    // 🔴 detele Store from id
+    
     func deleteStore(_ store: Store) {
         guard let id = store.id else { return }
         db.collection(collection).document(id).delete()

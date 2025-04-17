@@ -23,7 +23,6 @@ struct StoreDetailView: View {
 
     var body: some View {
         VStack {
-            // Título
             Text(store.name)
                 .foregroundStyle(Color.text)
                 .font(.largeTitle)
@@ -32,7 +31,7 @@ struct StoreDetailView: View {
             Text("Location: \(store.location)")
                 .foregroundStyle(Color.secondary)
 
-            // Session Info (Siempre visible)
+            
             let isCurrentStoreSession = sessionVM.session?.store?.id == store.id && sessionVM.session?.checkOut == nil
             let lastRecord = sessionVM.lastSession(for: store.id ?? "")
 
@@ -142,7 +141,7 @@ struct StoreDetailView: View {
 
             Spacer()
 
-            // Botón de Check-In/Out
+            
             if sessionVM.session?.store?.id != store.id || sessionVM.session?.checkOut != nil {
                 CustomButton(
                     title: "Check In",
@@ -168,11 +167,11 @@ struct StoreDetailView: View {
 }
 
 #Preview {
-    let sessionVM = SessionViewModel()
+    let sessionVM = SessionViewModel(userID: "preview-user")
     let storeVM = StoreViewModel()
     let store = Store(id: "store-1", name: "EG Barkarby", location: "Barkarby")
 
-    // Simular historial con último check-in y check-out
+    
     sessionVM.history = [
         SessionRecord(
             storeID: store.id ?? "store-1",
@@ -184,5 +183,5 @@ struct StoreDetailView: View {
 
     return StoreDetailView(store: store)
         .environmentObject(sessionVM)
-        .environmentObject(storeVM) // ✅ Añadir esto
+        .environmentObject(storeVM)
 }

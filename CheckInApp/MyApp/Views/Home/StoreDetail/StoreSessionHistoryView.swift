@@ -36,21 +36,21 @@ struct StoreSessionHistoryView: View {
 
 
 #Preview {
-    let sessionVM = SessionViewModel()
+    let sessionVM = SessionViewModel(userID: "preview-user")
     let storeID = "store-1"
 
  
     sessionVM.history = [
         SessionRecord(
             storeID: storeID,
-            checkIn: Date().addingTimeInterval(-7200),  // 2 horas atrás
-            checkOut: Date().addingTimeInterval(-3600), // 1 hora atrás
+            checkIn: Date().addingTimeInterval(-7200),
+            checkOut: Date().addingTimeInterval(-3600),
             userID: "test-user"
         ),
         SessionRecord(
             storeID: storeID,
-            checkIn: Date().addingTimeInterval(-10800),  // 3 horas atrás
-            checkOut: Date().addingTimeInterval(-9000),  // 2.5 horas atrás
+            checkIn: Date().addingTimeInterval(-10800),
+            checkOut: Date().addingTimeInterval(-9000),
             userID: "test-user"
         )
     ]

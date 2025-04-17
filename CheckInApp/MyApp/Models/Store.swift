@@ -17,7 +17,7 @@ struct Store: Identifiable, Codable, Equatable {
     var id: String?
     var name: String
     var location: String
-    var chain: String? // Opcional
+    var chain: String? 
     
     init(id: String? = nil, name: String, location: String, chain: String? = nil) {
         self.id = id
@@ -26,19 +26,4 @@ struct Store: Identifiable, Codable, Equatable {
         self.chain = chain
     }
 }
-//struct Session: Codable {
-//    var checkIn: Date?
-//    var checkOut: Date?
-//    var store: Store?
-//}
-//
-//
-//struct SessionRecord: Identifiable, Codable {
-//    @DocumentID var id: String? 
-//    var storeID: String
-//    var checkIn: Date
-//    var checkOut: Date
-//    var userID: String
-//}
-//
 

@@ -12,9 +12,7 @@ struct AddSurveyFormView: View {
     @ObservedObject var viewModel: CustomSurveyViewModel
 
     @State private var title = ""
-    @State private var questions: [SurveyQuestion] = [
-//        SurveyQuestion(text: "Example question", hasCheckmark: true, hasTextField: true)
-    ]
+    @State private var questions: [SurveyQuestion] = []
     @State private var questionText = ""
     @State private var includeCheckmark = true
     @State private var includeTextField = false

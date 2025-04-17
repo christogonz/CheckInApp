@@ -17,14 +17,17 @@ class SessionViewModel: ObservableObject {
     @Published var elapsedTime: TimeInterval = 0
 
     private var timerCancellable: AnyCancellable?
-    private let repository = SessionRepository()
+    private let repository: SessionRepository
     private var cancellables = Set<AnyCancellable>()
     private let db = Firestore.firestore()
+    private let userID: String
 
-    init() {
-        fetchActiveSessionFromFirestore()
-        listenToHistory()
-    }
+    init(userID: String) {
+            self.userID = userID
+            self.repository = SessionRepository(userID: userID)
+            fetchActiveSessionFromFirestore()
+            listenToHistory()
+        }
 
     private func listenToHistory() {
         repository.sessionsPublisher
@@ -49,7 +52,7 @@ class SessionViewModel: ObservableObject {
             storeID: storeID,
             checkIn: checkIn,
             checkOut: checkOutDate,
-            userID: Auth.auth().currentUser?.uid ?? "unknown"
+            userID: userID
         )
 
         repository.addSession(record)
@@ -74,7 +77,7 @@ class SessionViewModel: ObservableObject {
         timerCancellable?.cancel()
         timerCancellable = nil
     }
-    
+
     func lastSession(for storeID: String) -> SessionRecord? {
         return history
             .filter { $0.storeID == storeID }
@@ -83,17 +86,16 @@ class SessionViewModel: ObservableObject {
     }
 
     private func saveActiveSessionToFirestore() {
-        guard let uid = Auth.auth().currentUser?.uid else { return }
         guard let storeID = session?.store?.id else { return }
         guard let checkIn = session?.checkIn else { return }
 
         let data: [String: Any] = [
             "storeID": storeID,
             "checkIn": checkIn,
-            "userID": uid
+            "userID": userID
         ]
 
-        db.collection("activeSessions").document(uid).setData(data) { error in
+        db.collection("activeSessions").document(userID).setData(data) { error in
             if let error = error {
                 print("Error saving active session: \(error.localizedDescription)")
             }
@@ -101,8 +103,7 @@ class SessionViewModel: ObservableObject {
     }
 
     private func clearActiveSessionFromFirestore() {
-        guard let uid = Auth.auth().currentUser?.uid else { return }
-        db.collection("activeSessions").document(uid).delete { error in
+        db.collection("activeSessions").document(userID).delete { error in
             if let error = error {
                 print("Error removing active session: \(error.localizedDescription)")
             }
@@ -110,9 +111,7 @@ class SessionViewModel: ObservableObject {
     }
 
     private func fetchActiveSessionFromFirestore() {
-        guard let uid = Auth.auth().currentUser?.uid else { return }
-
-        db.collection("activeSessions").document(uid).getDocument { [weak self] snapshot, error in
+        db.collection("activeSessions").document(userID).getDocument { [weak self] snapshot, error in
             guard let data = snapshot?.data(),
                   let storeID = data["storeID"] as? String,
                   let checkIn = (data["checkIn"] as? Timestamp)?.dateValue() else {

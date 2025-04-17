@@ -11,4 +11,6 @@ struct UserModel: Identifiable, Codable {
     var id: String
     var email: String
     var displayName: String?
+    
+    var uid: String { id }
 }
