@@ -10,11 +10,14 @@ import SwiftUI
 struct ContentView: View {
     @StateObject var authVM = AuthViewModel()
     @StateObject var storeVM = StoreViewModel()
+    
 
     var body: some View {
         Group {
             if let user = authVM.user {
                 let sessionVM = SessionViewModel(userID: user.uid)
+                let profileVM = UserProfileViewModel()
+                
 
                 TabView {
                     HomeView()
@@ -22,7 +25,7 @@ struct ContentView: View {
                             Label("Home", systemImage: "house")
                         }
 
-                    ProfileView()
+                    ProfileView(profileVM: profileVM)
                         .tabItem {
                             Label("Settings", systemImage: "person")
                         }
@@ -30,6 +33,7 @@ struct ContentView: View {
                 .environmentObject(authVM)
                 .environmentObject(storeVM)
                 .environmentObject(sessionVM)
+                
             } else {
                 SignInView()
                     .environmentObject(authVM)

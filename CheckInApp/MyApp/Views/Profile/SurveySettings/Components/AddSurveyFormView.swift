@@ -58,7 +58,8 @@ struct AddSurveyFormView: View {
                 .padding()
                 .frame(maxWidth: .infinity)
                 .background(Color.accentColor)
-                .foregroundStyle(.white)
+                .foregroundStyle(.black)
+                .fontWeight(.semibold)
                 .clipShape(RoundedRectangle(cornerRadius: 10))
             }
 
@@ -112,7 +113,7 @@ struct AddSurveyFormView: View {
                 .frame(maxWidth: .infinity)
                 .padding()
                 .background(Color.accentColor)
-                .foregroundStyle(.white)
+                .foregroundStyle(.black)
                 .clipShape(RoundedRectangle(cornerRadius: 10))
             }
         }

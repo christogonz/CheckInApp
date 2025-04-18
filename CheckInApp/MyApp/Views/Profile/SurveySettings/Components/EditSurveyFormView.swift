@@ -35,7 +35,7 @@ struct EditSurveyFormView: View {
                     Label("Add Question", systemImage: "plus")
                         .padding(8)
                         .background(Color.accentColor)
-                        .foregroundStyle(.white)
+                        .foregroundStyle(.black)
                         .clipShape(RoundedRectangle(cornerRadius: 10))
                 }
 

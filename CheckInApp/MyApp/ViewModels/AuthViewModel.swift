@@ -7,6 +7,7 @@
 
 import Foundation
 import FirebaseAuth
+import FirebaseFirestore
 import SwiftUI
 
 class AuthViewModel: ObservableObject {
@@ -14,13 +15,15 @@ class AuthViewModel: ObservableObject {
     @Published var isLoading = false
     @Published var errorMessage: String?
 
+    private let db = Firestore.firestore()
+
     init() {
         checkUserSession()
     }
 
     func checkUserSession() {
         if let currentUser = Auth.auth().currentUser {
-            self.user = UserModel(id: currentUser.uid, email: currentUser.email ?? "", displayName: currentUser.displayName)
+            fetchUserData(uid: currentUser.uid)
         } else {
             self.user = nil
         }
@@ -36,13 +39,13 @@ class AuthViewModel: ObservableObject {
                 if let error = error {
                     self.errorMessage = error.localizedDescription
                 } else if let user = result?.user {
-                    self.user = UserModel(id: user.uid, email: user.email ?? "", displayName: user.displayName)
+                    self.fetchUserData(uid: user.uid)
                 }
             }
         }
     }
 
-    func register(email: String, password: String) {
+    func register(email: String, password: String, firstName: String, lastName: String) {
         isLoading = true
         errorMessage = nil
 
@@ -52,7 +55,40 @@ class AuthViewModel: ObservableObject {
                 if let error = error {
                     self.errorMessage = error.localizedDescription
                 } else if let user = result?.user {
-                    self.user = UserModel(id: user.uid, email: user.email ?? "", displayName: user.displayName)
+                    let newUser = UserModel(
+                        id: user.uid,
+                        email: email,
+                        displayName: "\(firstName) \(lastName)",
+                        photoURL: nil,
+                        firstName: firstName,
+                        lastName: lastName
+                    )
+
+                    self.saveUserToFirestore(user: newUser)
+                }
+            }
+        }
+    }
+
+    private func saveUserToFirestore(user: UserModel) {
+        do {
+            try db.collection("users").document(user.id).setData(from: user)
+            self.user = user
+        } catch {
+            self.errorMessage = "Error saving user: \(error.localizedDescription)"
+        }
+    }
+
+    private func fetchUserData(uid: String) {
+        db.collection("users").document(uid).getDocument { snapshot, error in
+            if let error = error {
+                self.errorMessage = "Failed to fetch user: \(error.localizedDescription)"
+                return
+            }
+
+            if let document = snapshot, let data = try? document.data(as: UserModel.self) {
+                DispatchQueue.main.async {
+                    self.user = data
                 }
             }
         }

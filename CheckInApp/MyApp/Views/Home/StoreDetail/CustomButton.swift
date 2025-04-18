@@ -10,6 +10,7 @@ import SwiftUI
 struct CustomButton: View {
     let title: String
     let backgroundColor: Color
+    let textColor: Color
     let action: () -> Void
 
     var body: some View {
@@ -24,7 +25,7 @@ struct CustomButton: View {
                 .frame(maxWidth: .infinity)
                 .padding()
                 .background(backgroundColor)
-                .foregroundStyle(.white)
+                .foregroundStyle(textColor)
                 .clipShape(RoundedRectangle(cornerRadius: 10))
 
         }
@@ -34,7 +35,8 @@ struct CustomButton: View {
 #Preview {
     CustomButton(
         title: "Check In",
-        backgroundColor: .blue,
+        backgroundColor: Color.accentColor,
+        textColor: .black,
         action: {
             print("Check In tapped")
         }

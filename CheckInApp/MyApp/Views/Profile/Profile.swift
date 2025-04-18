@@ -10,6 +10,7 @@ import SwiftUI
 struct ProfileView: View {
     @EnvironmentObject var authVM: AuthViewModel
     @State private var animateSignOut = false
+    @ObservedObject var profileVM: UserProfileViewModel
 
     var body: some View {
         NavigationStack {
@@ -30,16 +31,33 @@ struct ProfileView: View {
             } else {
                 ScrollView {
                     // MARK: Header
-                    HStack {
-                        Image(systemName: "person.circle")
-                            .font(.system(size: 60))
-                            .foregroundStyle(Color.accentColor)
-                            .padding(.trailing, 10)
+                    HStack(spacing: 10) {
+                        if let image = profileVM.image {
+                            Image(uiImage: image)
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 60, height: 60)
+                                .clipShape(Circle())
+                                .shadow(radius: 4)
+                        } else {
+                            Image(systemName: "person.circle")
+                                .font(.system(size: 60))
+                                .foregroundStyle(Color.accentColor)
+                                .padding(.trailing, 10)
+                        }
 
-                        Text("Chris Gonzalez")
-                            .foregroundStyle(Color.text)
-                            .font(.title)
-                            .fontWeight(.semibold)
+
+                        VStack(alignment: .leading) {
+                            Text(profileVM.firstName)
+                                .foregroundStyle(Color.text)
+                                .font(.title)
+                                .fontWeight(.semibold)
+                            
+                            Text(profileVM.lastName)
+                                .foregroundStyle(Color.secondary)
+                                .font(.title2)
+                                .fontWeight(.semibold)
+                        }
                         Spacer()
                     }
                     .padding()
@@ -97,12 +115,26 @@ struct ProfileView: View {
                 .background(Color.background)
             }
         }
+        .onAppear {
+            profileVM.loadUserData()
+        }
     }
 }
 
 #Preview {
-    ProfileView()
-        .environmentObject(AuthViewModel())
+    struct PreviewWrapper: View {
+        @StateObject private var mockProfileVM = UserProfileViewModel()
+
+        var body: some View {
+            ProfileView(profileVM: mockProfileVM)
+                .environmentObject(AuthViewModel())
+                .onAppear {
+                    mockProfileVM.firstName = "Christopher"
+                    mockProfileVM.lastName = "Gonzalez"
+                    mockProfileVM.image = UIImage(systemName: "person.crop.circle.fill")
+                }
+        }
+    }
+
+    return PreviewWrapper()
 }
-
-

@@ -44,6 +44,7 @@ struct EditStoreModal: View {
                 CustomButton(
                     title: "Delete",
                     backgroundColor: .red,
+                    textColor: .white,
                     action: {
                         storeVM.repository.deleteStore(store)
                         isPresented = false
@@ -53,6 +54,7 @@ struct EditStoreModal: View {
                 CustomButton(
                     title: "Save",
                     backgroundColor: Color.accentColor,
+                    textColor: .black,
                     action: {
                         storeVM.repository.updateStoreFields(
                             storeId: store.id ?? "",

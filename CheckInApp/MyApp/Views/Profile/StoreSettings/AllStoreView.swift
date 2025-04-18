@@ -30,7 +30,7 @@ struct AllStoreView: View {
                         .font(.title2)
                         .padding(8)
                         .background(Color.accentColor)
-                        .foregroundColor(.white)
+                        .foregroundColor(.black)
                         .clipShape(Circle())
                 }
             }

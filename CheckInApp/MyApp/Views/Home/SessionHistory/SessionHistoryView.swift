@@ -40,7 +40,7 @@ struct SessionHistoryView: View {
                         .font(.title2)
                         .padding(8)
                         .background(Color.accentColor)
-                        .foregroundStyle(.white)
+                        .foregroundStyle(.black)
                         .clipShape(Circle())
                 }
 

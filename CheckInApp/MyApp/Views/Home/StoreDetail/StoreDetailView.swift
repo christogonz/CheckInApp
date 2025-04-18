@@ -146,6 +146,7 @@ struct StoreDetailView: View {
                 CustomButton(
                     title: "Check In",
                     backgroundColor: Color.accentColor,
+                    textColor: Color.black,
                     action: {
                         sessionVM.checkIn(to: store)
                     }
@@ -154,6 +155,7 @@ struct StoreDetailView: View {
                 CustomButton(
                     title: "Check Out",
                     backgroundColor: Color.red,
+                    textColor: Color.white, 
                     action: {
                         sessionVM.checkOut()
                     }
