@@ -28,17 +28,23 @@ struct EditStoreModal: View {
                 .font(.title2)
                 .fontWeight(.semibold)
 
-            VStack(spacing: 12) {
+            VStack(alignment: .leading) {
+                Text("Store name")
+                    .foregroundStyle(.secondary)
                 TextField("Store Name", text: $name)
                     .padding()
                     .background(Color.gray.opacity(0.1))
                     .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .padding(.bottom, 5)
 
+                Text("Store Location")
+                    .foregroundStyle(.secondary)
                 TextField("Location", text: $location)
                     .padding()
                     .background(Color.gray.opacity(0.1))
                     .clipShape(RoundedRectangle(cornerRadius: 10))
             }
+            .padding(.bottom, 10)
 
             HStack(spacing: 15) {
                 CustomButton(
@@ -68,6 +74,7 @@ struct EditStoreModal: View {
 
             Spacer()
         }
+        .presentationBackground(.ultraThinMaterial)
         .padding()
         .presentationDetents([.medium, .large])
     }

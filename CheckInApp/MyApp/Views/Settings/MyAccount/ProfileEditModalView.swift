@@ -42,6 +42,7 @@ struct ProfileEditModalView: View {
             })
             Spacer()
         }
+        .presentationBackground(.ultraThinMaterial)
         .padding()
         .presentationDetents([.medium, .large])
     }

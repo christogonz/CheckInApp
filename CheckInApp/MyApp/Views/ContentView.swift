@@ -10,14 +10,25 @@ import SwiftUI
 struct ContentView: View {
     @StateObject var authVM = AuthViewModel()
     @StateObject var storeVM = StoreViewModel()
-    
 
     var body: some View {
         Group {
-            if let user = authVM.user {
+            if authVM.isCheckingSession {
+                // ⏳ Pantalla de carga
+                VStack {
+                    Spacer()
+                    ProgressView("Loading your account...")
+                        .progressViewStyle(CircularProgressViewStyle(tint: .accentColor))
+                        .font(.headline)
+                        .padding()
+                    Spacer()
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(Color.background)
+                .transition(.opacity)
+            } else if let user = authVM.user {
                 let sessionVM = SessionViewModel(userID: user.uid)
                 let profileVM = UserProfileViewModel()
-                
 
                 TabView {
                     HomeView()
@@ -25,7 +36,7 @@ struct ContentView: View {
                             Label("Home", systemImage: "house")
                         }
 
-                    ProfileView(profileVM: profileVM)
+                    SttingsView(profileVM: profileVM)
                         .tabItem {
                             Label("Settings", systemImage: "person")
                         }
@@ -33,7 +44,6 @@ struct ContentView: View {
                 .environmentObject(authVM)
                 .environmentObject(storeVM)
                 .environmentObject(sessionVM)
-                
             } else {
                 SignInView()
                     .environmentObject(authVM)

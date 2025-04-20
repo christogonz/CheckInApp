@@ -16,10 +16,27 @@ struct SignInView: View {
     @State private var isRegistering = false
 
     var body: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: 15) {
+            VStack {
+                Image(systemName: "baseball.diamond.bases.outs.indicator")
+                    .font(.system(size: 100, weight: .bold))
+                    .foregroundStyle(Color.accent
+                    )
+                
+                
+                Text("WorkPlan")
+                    .font(.system(size: 50, weight: .semibold, design: .rounded))
+                    .foregroundStyle(Color.text)
+            }
+            
+            
+            Spacer()
+            
             Text(isRegistering ? "Sign Up" : "Sign In")
                 .font(.largeTitle)
                 .fontWeight(.bold)
+                .foregroundStyle(Color.secondary)
+            
 
             if isRegistering {
                 TextField("First Name", text: $firstName)
@@ -95,6 +112,8 @@ struct SignInView: View {
                 }
             }
             .padding(.top, 5)
+            Spacer()
+            Spacer()
         }
         .padding()
         .frame(maxWidth: .infinity, maxHeight: .infinity)

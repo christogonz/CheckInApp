@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ProfileView: View {
+struct SttingsView: View {
     @EnvironmentObject var authVM: AuthViewModel
     @State private var animateSignOut = false
     @ObservedObject var profileVM: UserProfileViewModel
@@ -29,22 +29,23 @@ struct ProfileView: View {
                 .background(Color.background)
                 .transition(.opacity)
             } else {
-                ScrollView {
+                VStack {
                     // MARK: Header
                     HStack(spacing: 10) {
                         if let image = profileVM.image {
                             Image(uiImage: image)
                                 .resizable()
                                 .scaledToFill()
-                                .frame(width: 60, height: 60)
+                                .frame(width: 100, height: 100)
                                 .clipShape(Circle())
                                 .shadow(radius: 4)
                         } else {
                             Image(systemName: "person.circle")
-                                .font(.system(size: 60))
+                                .font(.system(size: 100))
                                 .foregroundStyle(Color.accentColor)
                                 .padding(.trailing, 10)
                         }
+
 
 
                         VStack(alignment: .leading) {
@@ -58,6 +59,7 @@ struct ProfileView: View {
                                 .font(.title2)
                                 .fontWeight(.semibold)
                         }
+                        .padding(.leading, 5)
                         Spacer()
                     }
                     .padding()
@@ -77,6 +79,7 @@ struct ProfileView: View {
                     SettingNavButton(icon: "storefront", title: "Store Settings", destionation: AllStoreView())
                     SettingNavButton(icon: "questionmark.text.page", title: "Survey Settings", destionation: CreateSurveyListView())
 
+                    
                     Divider()
                         .padding(.horizontal)
                         .padding(.top)
@@ -126,7 +129,7 @@ struct ProfileView: View {
         @StateObject private var mockProfileVM = UserProfileViewModel()
 
         var body: some View {
-            ProfileView(profileVM: mockProfileVM)
+            SttingsView(profileVM: mockProfileVM)
                 .environmentObject(AuthViewModel())
                 .onAppear {
                     mockProfileVM.firstName = "Christopher"

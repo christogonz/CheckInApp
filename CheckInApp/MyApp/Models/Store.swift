@@ -25,5 +25,19 @@ struct Store: Identifiable, Codable, Equatable {
         self.location = location
         self.chain = chain
     }
+    
+    
+    var logoImageName: String {
+        switch chain?.lowercased() {
+            case "elgiganten": return "eg_logo"
+            case "phonehouse": return "eph_logo"
+            case "telia": return "telia_logo"
+            case "tele2": return "tele2_logo"
+            case "telenor": return "telenor_logo"
+            case "tre": return "tre_logo"
+            default : return "default_logo"
+            
+        }
+    }
 }
 

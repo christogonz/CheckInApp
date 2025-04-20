@@ -23,7 +23,7 @@ struct AddQuestionModal: View {
 
             TextField("Write question here...", text: $questionText)
                 .padding()
-                .background(.thinMaterial)
+                .background(.thickMaterial)
                 .clipShape(RoundedRectangle(cornerRadius: 10))
 
             Toggle("Has Checkmark", isOn: $includeCheckmark)
@@ -39,10 +39,11 @@ struct AddQuestionModal: View {
                 questions.append(newQuestion)
                 dismiss()
             }
+            .fontWeight(.semibold)
             .frame(maxWidth: .infinity)
             .padding()
             .background(Color.accentColor)
-            .foregroundStyle(.white)
+            .foregroundStyle(.black)
             .clipShape(RoundedRectangle(cornerRadius: 10))
 
             Button("Cancel") {
@@ -50,14 +51,14 @@ struct AddQuestionModal: View {
             }
             .frame(maxWidth: .infinity)
             .padding()
-            .background(.ultraThinMaterial)
+            .background(.thickMaterial)
             .clipShape(RoundedRectangle(cornerRadius: 10))
 
             Spacer()
         }
         .padding()
         .presentationDetents([.medium, .large])
-        .background(.thinMaterial)
+        .presentationBackground(.thinMaterial)
     }
 }
 

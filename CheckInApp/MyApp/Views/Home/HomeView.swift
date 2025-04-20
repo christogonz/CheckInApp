@@ -11,9 +11,7 @@ import SwiftUI
 struct HomeView: View {
     var body: some View {
         NavigationStack {
-            VStack {
-                HeaderView()
-
+            ScrollView {
                 SmartListView()
 
                 Spacer()
@@ -21,6 +19,22 @@ struct HomeView: View {
                 ActiveSessionButton()
             }
             .background(Color("background"))
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Text("WorkPlan")
+                        .font(.title)
+                        .foregroundStyle(Color.accentColor)
+                        .fontWeight(.bold)
+                }
+                
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button(action: {}) {
+                        Image(systemName: "antenna.radiowaves.left.and.right")
+                    }
+                    .foregroundStyle(Color("text"))
+                    .fontWeight(.bold)
+                }
+            }
         }
     }
 }

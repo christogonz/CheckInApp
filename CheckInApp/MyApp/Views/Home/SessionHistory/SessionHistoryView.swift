@@ -23,7 +23,7 @@ struct SessionHistoryView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading) {
+        ScrollView(showsIndicators: false) {
             HStack {
                 Text("Session logs")
                     .foregroundStyle(Color.text)
@@ -92,8 +92,15 @@ struct SessionHistoryView: View {
             }
         }
         .background(Color.background)
+        .toolbar{
+            ToolbarItem(placement: .principal) {
+                    Text("Visits History")
+                
+                }
+            }
+        }
     }
-}
+
 
 #Preview {
     let sessionVM = SessionViewModel(userID: "preview-user")

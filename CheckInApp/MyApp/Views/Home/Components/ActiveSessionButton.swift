@@ -26,11 +26,11 @@ struct ActiveSessionButton: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Active Session: \(store.name)")
                         .font(.headline)
-                        .foregroundColor(.white)
+                        .foregroundColor(.black)
 
                     Text("⏱ \(formattedElapsedTime(from: sessionVM.elapsedTime))")
                         .font(.subheadline)
-                        .foregroundColor(.white.opacity(0.85))
+                        .foregroundColor(.black.opacity(0.5))
                 }
                 .padding()
                 .frame(maxWidth: .infinity, alignment: .leading)

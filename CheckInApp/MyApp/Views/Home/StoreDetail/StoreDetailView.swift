@@ -22,149 +22,145 @@ struct StoreDetailView: View {
     }
 
     var body: some View {
-        VStack {
-            Text(store.name)
-                .foregroundStyle(Color.text)
-                .font(.largeTitle)
-                .fontWeight(.bold)
+        NavigationStack {
+            ZStack(alignment: .bottom) {
+                ScrollView(showsIndicators: false) {
+                    VStack(alignment: .center) {
+                        // Header
+                        Text(store.name)
+                            .foregroundStyle(Color.text)
+                            .font(.largeTitle)
+                            .fontWeight(.bold)
 
-            Text("Location: \(store.location)")
-                .foregroundStyle(Color.secondary)
+                        Text("Location: \(store.location)")
+                            .foregroundStyle(Color.secondary)
+                            .padding(.bottom)
 
-            
-            let isCurrentStoreSession = sessionVM.session?.store?.id == store.id && sessionVM.session?.checkOut == nil
-            let lastRecord = sessionVM.lastSession(for: store.id ?? "")
+                        sessionInfoSection
 
-            HStack {
-                Spacer()
+                        Divider()
 
-                VStack {
-                    Text("Check-in")
-                        .fontWeight(.semibold)
-                        .foregroundStyle(Color.secondary)
-                    if isCurrentStoreSession, let checkIn = sessionVM.session?.checkIn {
-                        Text(checkIn.formatted(date: .omitted, time: .shortened))
-                    } else if let checkIn = lastRecord?.checkIn {
-                        Text(checkIn.formatted(date: .omitted, time: .shortened))
-                    } else {
-                        Text("-")
-                    }
-                    Spacer()
-                }
-                .frame(width: 100)
+                        // Surveys
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text("Surveys")
+                                .font(.title2)
+                                .fontWeight(.bold)
+                            ForEach(customSurveyVM.surveys) { survey in
+                                NavigationLink(destination: SurveyResponseView(
+                                    survey: survey,
+                                    store: store,
+                                    responseViewModel: responseVM)) {
+                                        Text(survey.title)
+                                            .foregroundStyle(Color.text)
+                                            .font(.headline)
+                                            .padding()
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                            .background(Color.secondary.opacity(0.12))
+                                            .clipShape(.rect(cornerRadius: 10))
+                                }
+                            }
 
-                Spacer()
-                Divider()
-                Spacer()
-
-                VStack {
-                    Text("Check-out")
-                        .fontWeight(.semibold)
-                        .foregroundStyle(Color.secondary)
-
-                    if isCurrentStoreSession {
-                        Text("-")
-                    } else if let checkOut = lastRecord?.checkOut {
-                        Text(checkOut.formatted(date: .omitted, time: .shortened))
-                    } else {
-                        Text("-")
-                    }
-
-                    Spacer()
-                }
-                .frame(width: 100)
-
-                Spacer()
-                Divider()
-                Spacer()
-
-                VStack {
-                    Text("In-Store")
-                        .fontWeight(.semibold)
-                        .foregroundStyle(Color.secondary)
-
-                    if isCurrentStoreSession, let checkIn = sessionVM.session?.checkIn {
-                        if sessionVM.session?.checkOut == nil {
-                            Text(formattedElapsedTime(from: checkIn, to: Date()))
-                        } else if let checkOut = sessionVM.session?.checkOut {
-                            Text(formattedElapsedTime(from: checkIn, to: checkOut))
+                            StoreSessionHistoryView(storeID: store.id ?? "")
                         }
-                    } else if let checkIn = lastRecord?.checkIn, let checkOut = lastRecord?.checkOut {
-                        Text(formattedElapsedTime(from: checkIn, to: checkOut))
-                    } else {
-                        Text("-")
                     }
-
-                    Spacer()
+                    .padding(.bottom, 100) // Space for button
+                    .padding()
                 }
-                .frame(width: 100)
 
-                Spacer()
+                // Bottom Button
+                VStack {
+                    HStack {
+                        if sessionVM.session?.store?.id != store.id || sessionVM.session?.checkOut != nil {
+                            Button(action: {
+                                sessionVM.checkIn(to: store)
+                            }) {
+                                Text("Check In")
+                                    .fontWeight(.semibold)
+                                    .frame(maxWidth: .infinity)
+                                    .padding()
+                                    .background(Color.accentColor)
+                                    .foregroundStyle(Color.black)
+                                    .clipShape(.rect(cornerRadius: 12))
+                            }
+                        } else {
+                            Button(action: {
+                                sessionVM.checkOut()
+                            }) {
+                                Text("Check Out")
+                                    .fontWeight(.semibold)
+                                    .frame(maxWidth: .infinity)
+                                    .padding()
+                                    .background(Color.red)
+                                    .foregroundStyle(Color.white)
+                                    .clipShape(.rect(cornerRadius: 12))
+                            }
+                        }
+                    }
+                    .padding()
+                    .background(.thinMaterial)
+                }
             }
-            .frame(height: 50)
+            .background(Color.background)
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Text(store.name)
+                        .font(.headline)
+                        .foregroundStyle(.primary)
+                }
+            }
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar(.hidden, for: .tabBar)
+        }
+    }
+
+    // MARK: - Extracted View
+    private var sessionInfoSection: some View {
+        let isCurrentSession = sessionVM.session?.store?.id == store.id && sessionVM.session?.checkOut == nil
+        let lastRecord = sessionVM.lastSession(for: store.id ?? "")
+
+        return HStack(spacing: 16) {
+            sessionDetail(title: "Check-in", value: {
+                if isCurrentSession, let checkIn = sessionVM.session?.checkIn {
+                    return checkIn.formatted(date: .omitted, time: .shortened)
+                } else if let checkIn = lastRecord?.checkIn {
+                    return checkIn.formatted(date: .omitted, time: .shortened)
+                }
+                return "-"
+            }())
 
             Divider()
-
-            // Surveys
-            Text("Surveys")
-                .font(.title2)
-                .fontWeight(.bold)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.top)
-
-            ScrollView(showsIndicators: false) {
-                VStack(alignment: .leading, spacing: 10) {
-                    ForEach(customSurveyVM.surveys) { survey in
-                        NavigationLink(
-                            destination: SurveyResponseView(
-                                survey: survey,
-                                store: store,
-                                responseViewModel: responseVM
-                            )
-                        ) {
-                            Text(survey.title)
-                                .foregroundStyle(Color.text)
-                                .font(.headline)
-                                .padding()
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .background(Color.secondary.opacity(0.12))
-                                .clipShape(.rect(cornerRadius: 10))
-                        }
-                    }
-
-                    // MARK: Session Logs Section
-                    StoreSessionHistoryView(storeID: store.id ?? "")
-                        .padding(.top)
+            sessionDetail(title: "Check-out", value: {
+                if isCurrentSession {
+                    return "-"
+                } else if let checkOut = lastRecord?.checkOut {
+                    return checkOut.formatted(date: .omitted, time: .shortened)
                 }
-            }
-            .padding(.top, 8)
+                return "-"
+            }())
 
-            Spacer()
-
+            Divider()
             
-            if sessionVM.session?.store?.id != store.id || sessionVM.session?.checkOut != nil {
-                CustomButton(
-                    title: "Check In",
-                    backgroundColor: Color.accentColor,
-                    textColor: Color.black,
-                    action: {
-                        sessionVM.checkIn(to: store)
-                    }
-                )
-            } else {
-                CustomButton(
-                    title: "Check Out",
-                    backgroundColor: Color.red,
-                    textColor: Color.white, 
-                    action: {
-                        sessionVM.checkOut()
-                    }
-                )
-            }
+            sessionDetail(title: "In-Store", value: {
+                if isCurrentSession, let checkIn = sessionVM.session?.checkIn {
+                    return formattedElapsedTime(from: checkIn, to: Date())
+                } else if let checkIn = lastRecord?.checkIn, let checkOut = lastRecord?.checkOut {
+                    return formattedElapsedTime(from: checkIn, to: checkOut)
+                }
+                return "-"
+            }())
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .padding(.horizontal)
-        .background(Color.background)
+        .frame(maxWidth: .infinity)
+    }
+
+    private func sessionDetail(title: String, value: String) -> some View {
+        VStack {
+            Text(title)
+                .fontWeight(.semibold)
+                .foregroundStyle(.secondary)
+            Text(value)
+                .font(.subheadline)
+        }
+        .frame(maxWidth: .infinity)
     }
 }
 
@@ -173,7 +169,6 @@ struct StoreDetailView: View {
     let storeVM = StoreViewModel()
     let store = Store(id: "store-1", name: "EG Barkarby", location: "Barkarby")
 
-    
     sessionVM.history = [
         SessionRecord(
             storeID: store.id ?? "store-1",

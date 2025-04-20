@@ -14,6 +14,7 @@ class AuthViewModel: ObservableObject {
     @Published var user: UserModel?
     @Published var isLoading = false
     @Published var errorMessage: String?
+    @Published var isCheckingSession = true 
 
     private let db = Firestore.firestore()
 
@@ -26,6 +27,7 @@ class AuthViewModel: ObservableObject {
             fetchUserData(uid: currentUser.uid)
         } else {
             self.user = nil
+            self.isCheckingSession = false // ✅ terminamos de revisar
         }
     }
 
@@ -81,15 +83,17 @@ class AuthViewModel: ObservableObject {
 
     private func fetchUserData(uid: String) {
         db.collection("users").document(uid).getDocument { snapshot, error in
-            if let error = error {
-                self.errorMessage = "Failed to fetch user: \(error.localizedDescription)"
-                return
-            }
+            DispatchQueue.main.async {
+                if let error = error {
+                    self.errorMessage = "Failed to fetch user: \(error.localizedDescription)"
+                    self.isCheckingSession = false
+                    return
+                }
 
-            if let document = snapshot, let data = try? document.data(as: UserModel.self) {
-                DispatchQueue.main.async {
+                if let document = snapshot, let data = try? document.data(as: UserModel.self) {
                     self.user = data
                 }
+                self.isCheckingSession = false // ✅ se terminó la verificación
             }
         }
     }
